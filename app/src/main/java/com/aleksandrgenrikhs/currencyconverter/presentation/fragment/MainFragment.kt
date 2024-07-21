@@ -1,16 +1,17 @@
 package com.aleksandrgenrikhs.currencyconverter.presentation.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AutoCompleteTextView
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.aleksandrgenrikhs.currencyconverter.R
@@ -20,6 +21,7 @@ import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesForC
 import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesItem
 import com.aleksandrgenrikhs.currencyconverter.presentation.viewmodel.MainViewModel
 import com.aleksandrgenrikhs.currencyconverter.viewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
@@ -29,6 +31,8 @@ class MainFragment : Fragment() {
     private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
     private var currenciesForConvert: CurrenciesForConvert? = null
+
+    private var showError = false
 
     private val navController: NavController by lazy {
         (requireActivity().supportFragmentManager.findFragmentById(R.id.main_activity_nav_host) as NavHostFragment)
@@ -53,40 +57,48 @@ class MainFragment : Fragment() {
     }
 
     private fun subscribe() {
-        lifecycleScope.launch {
-            viewModel.uiState.collect { uiState ->
-                if (uiState.isError) {
-                    Toast.makeText(requireContext(), uiState.error, Toast.LENGTH_SHORT).show()
-                }
-                if (!uiState.isNetworkConnected) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.is_not_internet),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                binding.progressBar.isVisible = uiState.isLoading
-                binding.mainLayout.isVisible = !uiState.isLoading
-                uiState.currencyItems?.let {
-                    initFromCurrencies(it) { selectedCurrency ->
-                        viewModel.onFromCurrencySelected(selectedCurrency)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    if (!uiState.isNetworkConnected && !showError) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.is_not_internet),
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setBackgroundTint(requireContext().getColor(R.color.colorOnPrimary))
+                            .show()
+                        showError = true
                     }
-                    initToCurrencies(it) { selectedCurrency ->
-                        viewModel.onToCurrencySelected(selectedCurrency)
+                    if (uiState.isError && !showError) {
+                        Snackbar.make(binding.root, uiState.error, Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(requireContext().getColor(R.color.colorOnPrimary))
+                            .show()
                     }
+
+                    binding.progressBar.isVisible = uiState.isLoading
+                    binding.mainLayout.isVisible = !uiState.isLoading
+                    uiState.currencyItems?.let {
+                        initFromCurrencies(it) { selectedCurrency ->
+                            viewModel.onFromCurrencySelected(selectedCurrency)
+                        }
+                        initToCurrencies(it) { selectedCurrency ->
+                            viewModel.onToCurrencySelected(selectedCurrency)
+                        }
+                    }
+                    binding.txtFromCurrencyCode.text = uiState.currencyCodeFrom
+                    binding.txtSpnFromCountry.setText(uiState.currencyNameFrom, false)
+                    binding.txtToCurrencyCode.text = uiState.currencyCodeTo
+                    binding.txtSpnToCountry.setText(uiState.currencyNameTo, false)
+                    binding.convertButton.isVisible = uiState.currencyNameFrom.isNotEmpty()
+                            && uiState.currencyNameTo.isNotEmpty()
+                            && uiState.amount != 0.0
+                    currenciesForConvert = CurrenciesForConvert(
+                        uiState.currencyCodeFrom,
+                        uiState.currencyCodeTo,
+                        uiState.amount
+                    )
                 }
-                binding.txtFromCurrencyCode.text = uiState.currencyCodeFrom
-                binding.txtSpnFromCountry.setText(uiState.currencyNameFrom, false)
-                binding.txtToCurrencyCode.text = uiState.currencyCodeTo
-                binding.txtSpnToCountry.setText(uiState.currencyNameTo, false)
-                binding.convertButton.isVisible = uiState.currencyNameFrom.isNotEmpty()
-                        && uiState.currencyNameTo.isNotEmpty()
-                        && uiState.amount != 0.0
-                currenciesForConvert = CurrenciesForConvert(
-                    uiState.currencyCodeFrom,
-                    uiState.currencyCodeTo,
-                    uiState.amount
-                )
             }
         }
     }

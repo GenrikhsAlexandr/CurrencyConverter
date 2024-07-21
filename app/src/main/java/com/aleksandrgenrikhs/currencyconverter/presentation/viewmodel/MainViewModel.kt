@@ -40,31 +40,33 @@ class MainViewModel @Inject constructor(
     }
 
     private fun loadCurrencies() {
-        viewModelScope.launch {
-            _uiState.update { uiState ->
-                uiState.copy(
-                    isLoading = true
-                )
-            }
-            interactor.getCurrencies()
-            when (val response = interactor.getCurrencies()) {
-                is NetworkResponse.Success -> {
-                    processCurrencies(response.data)
+            viewModelScope.launch {
+                _uiState.update { uiState ->
+                    uiState.copy(
+                        isLoading = true
+                    )
                 }
+                if (uiState.value.isNetworkConnected) {
+                    interactor.getCurrencies()
+                when (val response = interactor.getCurrencies()) {
+                    is NetworkResponse.Success -> {
+                        processCurrencies(response.data)
+                    }
 
-                is NetworkResponse.Error -> {
-                    _uiState.update { uiState ->
-                        uiState.copy(
-                            isError = true,
-                            error = response.errorObject.error.message
-                        )
+                    is NetworkResponse.Error -> {
+                        _uiState.update { uiState ->
+                            uiState.copy(
+                                isError = true,
+                                error = response.errorObject.error.message
+                            )
+                        }
                     }
                 }
-            }
-            _uiState.update { uiState ->
-                uiState.copy(
-                    isLoading = false
-                )
+                _uiState.update { uiState ->
+                    uiState.copy(
+                        isLoading = false
+                    )
+                }
             }
         }
     }

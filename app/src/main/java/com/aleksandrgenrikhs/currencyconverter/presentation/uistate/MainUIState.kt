@@ -1,10 +1,9 @@
 package com.aleksandrgenrikhs.currencyconverter.presentation.uistate
 
-import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesForConvert
 import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesItem
 
 data class MainUIState(
-    val error: String? = null,
+    val error: String = "",
     val isError:Boolean=false,
     val currencyNameFrom: String = "",
     val currencyCodeFrom: String = "",

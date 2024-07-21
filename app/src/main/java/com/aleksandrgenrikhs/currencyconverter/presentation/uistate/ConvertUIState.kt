@@ -1,7 +1,7 @@
 package com.aleksandrgenrikhs.currencyconverter.presentation.uistate
 
 data class ConvertUIState(
-    val error: String? = null,
+    val error: String = "",
     val isError:Boolean=false,
     val amountForFrom: Double = 0.00,
     val currencyFromCode: String = "",

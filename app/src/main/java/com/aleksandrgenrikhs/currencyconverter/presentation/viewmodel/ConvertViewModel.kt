@@ -28,47 +28,49 @@ class ConvertViewModel @Inject constructor(
         convertCurrencies()
     }
 
-     fun convertCurrencies() {
+     private fun convertCurrencies() {
         viewModelScope.launch {
             _uiState.update { uiState ->
                 uiState.copy(
                     isLoading = true
                 )
             }
-            when (
-                val response = interactor.covertCurrencies(
-                    currencies.currencyCodeFrom,
-                    currencies.currencyCodeTo,
-                    currencies.amount
-                )) {
-                is NetworkResponse.Success -> {
-                    with(response.data) {
+            if (uiState.value.isNetworkConnected) {
+                when (
+                    val response = interactor.covertCurrencies(
+                        currencies.currencyCodeFrom,
+                        currencies.currencyCodeTo,
+                        currencies.amount
+                    )) {
+                    is NetworkResponse.Success -> {
+                        with(response.data) {
+                            _uiState.update { uiState ->
+                                uiState.copy(
+                                    updatedDate = updatedDate,
+                                    currencyFromCode = baseCurrencyCode,
+                                    amountForFrom = amount,
+                                    currencyToCode = currencyCode,
+                                    amountForTo = rateForAmount
+                                )
+                            }
+                        }
+                    }
+
+                    is NetworkResponse.Error -> {
+                        println("currencies = ${response.errorObject.error.message}")
                         _uiState.update { uiState ->
                             uiState.copy(
-                                updatedDate = updatedDate,
-                                currencyFromCode = baseCurrencyCode,
-                                amountForFrom = amount,
-                                currencyToCode = currencyCode,
-                                amountForTo = rateForAmount
+                                isError = true,
+                                error = response.errorObject.error.message
                             )
                         }
                     }
                 }
-
-                is NetworkResponse.Error -> {
-                    println("currencies = ${response.errorObject.error.message}")
-                    _uiState.update { uiState ->
-                        uiState.copy(
-                            isError = true,
-                            error = response.errorObject.error.message
-                        )
-                    }
+                _uiState.update { uiState ->
+                    uiState.copy(
+                        isLoading = false
+                    )
                 }
-            }
-            _uiState.update { uiState ->
-                uiState.copy(
-                    isLoading = false
-                )
             }
         }
     }

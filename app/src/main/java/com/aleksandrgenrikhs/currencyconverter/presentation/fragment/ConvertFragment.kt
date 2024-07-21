@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +17,7 @@ import com.aleksandrgenrikhs.currencyconverter.app
 import com.aleksandrgenrikhs.currencyconverter.databinding.FragmentConvertBinding
 import com.aleksandrgenrikhs.currencyconverter.presentation.factory.ConvertViewModelAssistedFactory
 import com.aleksandrgenrikhs.currencyconverter.presentation.viewmodel.ConvertViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,6 +41,8 @@ class ConvertFragment : Fragment() {
         )
     }
 
+    private var showError = false
+
     override fun onAttach(context: Context) {
         (app.appComponent.inject(this))
         super.onAttach(context)
@@ -61,18 +63,25 @@ class ConvertFragment : Fragment() {
     }
 
     private fun subscribe() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             with(binding) {
                 viewModel.uiState.collect { uiState ->
                     if (uiState.isError) {
-                        Toast.makeText(requireContext(), uiState.error, Toast.LENGTH_SHORT).show()
+                        Snackbar.make(binding.root, uiState.error, Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(requireContext().getColor(R.color.colorOnPrimary))
+                            .show()
+                        showError = true
                     }
                     if (!uiState.isNetworkConnected) {
-                        Toast.makeText(
-                            requireContext(),
+                        Snackbar.make(
+                            binding.root,
                             getString(R.string.is_not_internet),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setBackgroundTint(requireContext().getColor(R.color.colorOnPrimary))
+                            .show()
+                        showError = true
+
                     }
                     binding.progressBar.isVisible = uiState.isLoading
                     binding.mainLayout.isVisible = !uiState.isLoading
