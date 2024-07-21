@@ -6,7 +6,5 @@
     android:padding="16dp"
     android:ellipsize="end"
     android:maxLines="1"
-    android:textColor="@color/white"
-    android:background="@color/colorDetail"
-    android:textAppearance="?attr/textAppearanceTitleMedium"
-    />
+    android:textAppearance="@style/TextAppearance.CurrencyConverter"
+    android:background="@color/colorDetail" />

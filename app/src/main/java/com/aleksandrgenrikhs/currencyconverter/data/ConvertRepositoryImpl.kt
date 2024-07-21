@@ -3,9 +3,9 @@ package com.aleksandrgenrikhs.currencyconverter.data
 import android.app.Application
 import com.aleksandrgenrikhs.currencyconverter.data.mapper.ConvertMapper
 import com.aleksandrgenrikhs.currencyconverter.data.mapper.CurrenciesMapper
-import com.aleksandrgenrikhs.currencyconverter.domain.model.Convert
 import com.aleksandrgenrikhs.currencyconverter.domain.ConvertRepository
 import com.aleksandrgenrikhs.currencyconverter.domain.NetworkConnectionChecker
+import com.aleksandrgenrikhs.currencyconverter.domain.model.Convert
 import com.aleksandrgenrikhs.currencyconverter.domain.model.Currencies
 import com.aleksandrgenrikhs.currencyconverter.utils.ErrorObject
 import com.aleksandrgenrikhs.currencyconverter.utils.NetworkResponse
@@ -44,7 +44,7 @@ class ConvertRepositoryImpl
                         status = "unknown",
                         error = ErrorObject.Error(
                             message = response.message(),
-                            code = response.code().toString()
+                            code = response.code()
                         )
                     )
                 )
@@ -55,7 +55,7 @@ class ConvertRepositoryImpl
                         status = "unknown",
                         error = ErrorObject.Error(
                             message = e.message ?: "Unknown error",
-                            code = "-1"
+                            code = -1
                         )
                     )
                 )
@@ -88,7 +88,7 @@ class ConvertRepositoryImpl
                         status = "unknown",
                         error = ErrorObject.Error(
                             message = response.message(),
-                            code = response.code().toString()
+                            code = response.code()
                         )
                     )
                 )
@@ -99,7 +99,7 @@ class ConvertRepositoryImpl
                         status = "unknown",
                         error = ErrorObject.Error(
                             message = e.message ?: "Unknown error",
-                            code = "-1"
+                            code = -1
                         )
                     )
                 )

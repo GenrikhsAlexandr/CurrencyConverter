@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.aleksandrgenrikhs.currencyconverter.domain.ConvertInteractor
 import com.aleksandrgenrikhs.currencyconverter.domain.model.Currencies
 import com.aleksandrgenrikhs.currencyconverter.presentation.mapper.CurrenciesItemMapper
-import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesForConvert
 import com.aleksandrgenrikhs.currencyconverter.presentation.model.CurrenciesItem
 import com.aleksandrgenrikhs.currencyconverter.presentation.uistate.MainUIState
 import com.aleksandrgenrikhs.currencyconverter.utils.NetworkResponse
@@ -40,7 +39,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun loadCurrencies() {
+    private fun loadCurrencies() {
         viewModelScope.launch {
             _uiState.update { uiState ->
                 uiState.copy(

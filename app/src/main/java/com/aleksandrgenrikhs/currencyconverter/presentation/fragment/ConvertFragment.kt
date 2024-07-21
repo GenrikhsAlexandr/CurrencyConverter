@@ -1,14 +1,14 @@
 package com.aleksandrgenrikhs.currencyconverter.presentation.fragment
 
 import android.content.Context
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -16,8 +16,8 @@ import androidx.navigation.fragment.navArgs
 import com.aleksandrgenrikhs.currencyconverter.R
 import com.aleksandrgenrikhs.currencyconverter.app
 import com.aleksandrgenrikhs.currencyconverter.databinding.FragmentConvertBinding
-import com.aleksandrgenrikhs.currencyconverter.presentation.viewmodel.ConvertViewModel
 import com.aleksandrgenrikhs.currencyconverter.presentation.factory.ConvertViewModelAssistedFactory
+import com.aleksandrgenrikhs.currencyconverter.presentation.viewmodel.ConvertViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,7 +60,7 @@ class ConvertFragment : Fragment() {
         subscribe()
     }
 
- private fun subscribe(){
+    private fun subscribe() {
         lifecycleScope.launch {
             with(binding) {
                 viewModel.uiState.collect { uiState ->

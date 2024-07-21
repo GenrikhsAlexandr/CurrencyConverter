@@ -1,12 +1,11 @@
 <resources>
-    <string name="app_name">Currency converter</string>
+    <string name="app_name">Курс валют</string>
     <string name="is_not_internet">Произошла ошибка, проверьте подключение к интернету</string>
     <string name="currency_select_default_hint">Выберите валюту</string>
     <string name="convert">Конвертировать</string>
     <string name="from">Из</string>
     <string name="to">В</string>
     <string name="amount">Сумма</string>
-    <string name="result">Result</string>
     <string name="converted_amount">Converted Amount</string>
 
 </resources>

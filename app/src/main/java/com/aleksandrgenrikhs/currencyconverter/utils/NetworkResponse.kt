@@ -20,6 +20,6 @@ data class ErrorObject(
     @Serializable
     data class Error(
         val message: String,
-        val code: String
+        val code: Int
     )
 }
