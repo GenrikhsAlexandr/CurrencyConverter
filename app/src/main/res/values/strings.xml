@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Курс валют</string>
     <string name="is_not_internet">Произошла ошибка, проверьте подключение к интернету</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="failed_status">Неудачный</string>
     <string name="currency_select_default_hint">Выберите валюту</string>
     <string name="convert">Конвертировать</string>
     <string name="from">Из</string>

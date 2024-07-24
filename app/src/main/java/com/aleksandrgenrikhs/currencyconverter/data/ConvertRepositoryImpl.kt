@@ -1,6 +1,7 @@
 package com.aleksandrgenrikhs.currencyconverter.data
 
 import android.app.Application
+import com.aleksandrgenrikhs.currencyconverter.R
 import com.aleksandrgenrikhs.currencyconverter.data.mapper.ConvertMapper
 import com.aleksandrgenrikhs.currencyconverter.data.mapper.CurrenciesMapper
 import com.aleksandrgenrikhs.currencyconverter.domain.ConvertRepository
@@ -28,33 +29,36 @@ class ConvertRepositoryImpl
             try {
                 val response = service.getCurrenciesList()
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        return@withContext NetworkResponse.Success(currenciesMapper.map(response.body()!!))
-                    }
-                }
-                val errorBody = response.errorBody()
-                if (errorBody != null) {
-                    val errorObject =
-                        Json.decodeFromString(ErrorObject.serializer(), errorBody.string())
-                    return@withContext NetworkResponse.Error(errorObject)
-                }
-                return@withContext NetworkResponse.Error(
-                    ErrorObject(
-                        status = "unknown",
-                        error = ErrorObject.Error(
-                            message = response.message(),
-                            code = response.code()
-                        )
+                    return@withContext NetworkResponse.Success(response.body()
+                        ?.let { currenciesMapper.map(it) } ?: emptyList()
                     )
-                )
+                } else {
+                    val errorBody = response.errorBody()
+                    val errorObject =
+                        errorBody?.let {
+                            Json.decodeFromString(
+                                ErrorObject.serializer(),
+                                it.string()
+                            )
+                        }
+                    return@withContext errorObject?.let { NetworkResponse.Error(it) }
+                        ?: NetworkResponse.Error(
+                            ErrorObject(
+                                status = application.getString(R.string.failed_status),
+                                error = ErrorObject.Error(
+                                    message = application.getString(R.string.unknown_error),
+                                    code = -1
+                                )
+                            )
+                        )
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 return@withContext NetworkResponse.Error(
                     ErrorObject(
-                        status = "unknown",
+                        status = application.getString(R.string.failed_status),
                         error = ErrorObject.Error(
-                            message = e.message ?: "Unknown error",
+                            message =e.message?: application.getString(R.string.unknown_error),
                             code = -1
                         )
                     )
@@ -72,33 +76,44 @@ class ConvertRepositoryImpl
             try {
                 val response = service.convertCurrency(from = from, to = to, amount = amount)
                 if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        return@withContext NetworkResponse.Success(convertMapper.map(response.body()!!))
-                    }
-                }
-                val errorBody = response.errorBody()
-                if (errorBody != null) {
-                    val errorObject =
-                        Json.decodeFromString(ErrorObject.serializer(), errorBody.string())
-                    return@withContext NetworkResponse.Error(errorObject)
-                }
-                return@withContext NetworkResponse.Error(
-                    ErrorObject(
-                        status = "unknown",
-                        error = ErrorObject.Error(
-                            message = response.message(),
-                            code = response.code()
+                    response.body()?.let { convertMapper.map(it) }
+                        ?.let { NetworkResponse.Success(it) }
+                        ?: NetworkResponse.Error(
+                            ErrorObject(
+                                status = application.getString(R.string.failed_status),
+                                error = ErrorObject.Error(
+                                    message = application.getString(R.string.unknown_error),
+                                    code = -1
+                                )
+                            )
                         )
-                    )
-                )
+                } else {
+                    val errorBody = response.errorBody()
+                    val errorObject =
+                        errorBody?.let {
+                            Json.decodeFromString(
+                                ErrorObject.serializer(),
+                                it.string()
+                            )
+                        }
+                    errorObject?.let { NetworkResponse.Error(it) }
+                        ?: NetworkResponse.Error(
+                            ErrorObject(
+                                status = application.getString(R.string.failed_status),
+                                error = ErrorObject.Error(
+                                    message = application.getString(R.string.unknown_error),
+                                    code = -1
+                                )
+                            )
+                        )
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                return@withContext NetworkResponse.Error(
+                NetworkResponse.Error(
                     ErrorObject(
-                        status = "unknown",
+                        status = application.getString(R.string.failed_status),
                         error = ErrorObject.Error(
-                            message = e.message ?: "Unknown error",
+                            message =e.message?: application.getString(R.string.unknown_error),
                             code = -1
                         )
                     )
